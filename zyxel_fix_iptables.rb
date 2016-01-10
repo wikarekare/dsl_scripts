@@ -16,6 +16,8 @@ require_relative '../rlib/configuration.rb' #need to replace with a gem
 #
 #An alternate fix would be to double NAT. i.e put a NAT router between the internal subnets and the Zyxel. 
 
+#puts "In Zyxel fix iptables"
+
 @zyxel = Configuration.new('/usr/local/wikk/etc/keys/vdsl1.json')
 
 #determine if we need to fix the NAT rules (hence also do other changes too)
