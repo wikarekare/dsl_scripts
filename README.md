@@ -2,7 +2,8 @@
 
 scripts to update zyxel's iptables, change default passwords and issue random shell commands through ssh.
 
-##zyxel_fix_ip_tables.rb_
+##zyxel_fix_ip_tables.rb
+
 Zyxel VMG8324-B10A manual shows how to set up multiple routed subnets on the internal network 
 unfortunately, it then sets up the ip Masquerade rule to only allow the subnet directly on the interface of the Zyxel,
 to connect to the internet.
@@ -18,7 +19,7 @@ The Zyxel also has default passwords in the firmware, that are well known, and c
 I also set up iptable rules to allow only specified internal networks to connect to the Zyxel itself, and deny all external connections to the Zyxel. This does not stop traffic that is forwarded to/from the Internet.
 
 A json config file with the keys for the Zyxel has the form:
-
+```
 {
   "admin_user": "admin",
   "admin_key":  "random-pwd-1",
@@ -31,8 +32,8 @@ A json config file with the keys for the Zyxel has the form:
   "local_lan": "192.168.1.0/24"
   "admin_lans": ["192.168.2.0/24","10.0.1.0/24]
 }
-
-Depends on configuration.rb
+```
+**Nb.** *Depends on configuration.rb*
 
 ##zyxel_dump_nat.rb
 
