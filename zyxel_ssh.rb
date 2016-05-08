@@ -1,4 +1,4 @@
-#!/usr/local/bin/ruby
+#!/usr/local/ruby2.2/bin/ruby
 require 'rubygems'
 require 'net/ssh'
 require 'net/ssh/telnet'
