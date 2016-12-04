@@ -2,11 +2,10 @@
 require 'rubygems'
 require 'net/ssh'
 require 'net/ssh/telnet'
-require_relative '../rlib/configuration.rb' #need to replace with a gem
-
+require_relative 'wikk_configuration' 
 #Connects to the Zyxel VDSL modem and dumps the IP tables.
 
-@config = Configuration.new('/usr/local/wikk/etc/keys/vdsl1.json')
+@config = WIKK::Configuration.new('/usr/local/wikk/etc/keys/vdsl1.json')
 
 begin
 Net::SSH::Transport::Algorithms::ALGORITHMS[:encryption] = %w(3des-cbc none)
