@@ -33,7 +33,7 @@ A json config file with the keys for the Zyxel has the form:
   "admin_lans": ["192.168.2.0/24","10.0.1.0/24]
 }
 ```
-**Nb.** *Depends on configuration.rb*
+**Nb.** *Depends on wikk_configuration gem*
 
 ##zyxel_dump_nat.rb
 
