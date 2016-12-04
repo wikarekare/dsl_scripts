@@ -4,7 +4,7 @@ require 'net/ssh'
 require 'net/ssh/telnet'
 require 'yaml'
 require 'pp'
-require_relative '../rlib/configuration.rb' #need to replace with a gem
+require_relative 'wikk_configuration' 
 
 #Zyxel VMG8324-B10A manual shows how to set up multiple routed subnets on the internal network 
 #unfortunately, it then sets up the ip Masquerade rule to only allow the subnet on the interface of the Zyxel
@@ -18,7 +18,7 @@ require_relative '../rlib/configuration.rb' #need to replace with a gem
 
 #puts "In Zyxel fix iptables"
 
-@zyxel = Configuration.new('/usr/local/wikk/etc/keys/vdsl1.json')
+@zyxel = WIKK::Configuration.new('/usr/local/wikk/etc/keys/vdsl1.json')
 
 #determine if we need to fix the NAT rules (hence also do other changes too)
 def fix_nat_rule(line)
@@ -78,8 +78,8 @@ begin
         t.cmd "iptables -I INPUT 1 -p icmp  -j ACCEPT"
 
         #ADSL net addresses. Need to change these to service rules
-        t.cmd "iptables -I INPUT 1 -p tcp -s #{@zyxel.local_net} -j ACCEPT"
-        t.cmd "iptables -I INPUT 1 -p udp -s #{@zyxel.local_net} -j ACCEPT"
+        t.cmd "iptables -I INPUT 1 -p tcp -s #{@zyxel.local_lan} -j ACCEPT"
+        t.cmd "iptables -I INPUT 1 -p udp -s #{@zyxel.local_lan} -j ACCEPT"
 
         @zyxel.admin_lans.each do |l| 
           #Admin possible from these Net addresses. (Need to change these to service rules)
