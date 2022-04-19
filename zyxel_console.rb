@@ -6,7 +6,7 @@ require 'wikk_configuration'
 RLIB = '../../../rlib'
 require_relative "#{RLIB}/wikk_conf.rb"
 
-# SSH to the VDSL Modem and run the command specified by the arguments passed.
+# SSH to the VDSL modem and run the command specified by the arguments passed.
 
 @config = WIKK::Configuration.new("#{KEYS_DIR}/#{ARGV[0]}")
 
@@ -17,7 +17,7 @@ begin
     t = Net::SSH::Telnet.new('Session' => session, 'Prompt' => /^.*[>#] .*$/, 'Telnetmode' => false)
 
     # Get a shell
-    t.cmd( 'echo && bash')
+    # t.cmd( 'echo && bash')
 
     # Check ip tables haven't reverted to dumb state, and fix if necessary
     @output = ''

@@ -1,33 +1,36 @@
-#!/usr/local/ruby2.2/bin/ruby
+#!/usr/local/bin/ruby
 require 'rubygems'
 require 'net/ssh'
 require 'net/ssh/telnet'
-require_relative 'wikk_configuration' 
-#Connects to the Zyxel VDSL modem and dumps the IP tables.
+require 'wikk_configuration'
+RLIB = '../../../rlib'
+require_relative "#{RLIB}/wikk_conf.rb"
 
-@config = WIKK::Configuration.new('/usr/local/wikk/etc/keys/vdsl1.json')
+# Connects to the VDSL modem and dumps the IP tables.
+
+@config = WIKK::Configuration.new("#{KEYS_DIR}/#{ARGV[0]}")
 
 begin
-Net::SSH::Transport::Algorithms::ALGORITHMS[:encryption] = %w(3des-cbc none)
+  Net::SSH::Transport::Algorithms::ALGORITHMS[:encryption] = [ '3des-cbc', 'none' ]
 
-  Net::SSH.start(@config.hostname, @config.admin_user, :password => @config.admin_key) do |session|
-    t = Net::SSH::Telnet.new("Session" => session, "Prompt" => /^.*[>#] .*$/, "Telnetmode" => false)
+  Net::SSH.start(@config.hostname, @config.admin_user, password: @config.admin_key) do |session|
+    t = Net::SSH::Telnet.new('Session' => session, 'Prompt' => /^.*[>#] .*$/, 'Telnetmode' => false)
 
-    #Get a shell
-    t.cmd( 'echo && bash') 
-    
-    #Check ip tables haven't reverted to dumb state, and fix if necessary
-    @output = ""
-    t.cmd( 'iptables -t nat -L POSTROUTING --line-numbers')  { |o| @output << o } #Found sometimes we get partial lines back.
+    # Get a shell
+    t.cmd( 'echo && bash')
+
+    # Check ip tables haven't reverted to dumb state, and fix if necessary
+    @output = ''
+    t.cmd( 'iptables -t nat -L POSTROUTING --line-numbers') { |o| @output << o } # Found sometimes we get partial lines back.
     @output.each_line do |l|
       puts l
     end
 
-    #Exit sh
+    # Exit sh
     t.puts 'exit'
-    #Exit CLI
+    # Exit CLI
     t.puts 'exit'
   end
-rescue Exception => error
-puts "Error: #{error}"
+rescue Exception => e
+  puts "Error: #{e}"
 end

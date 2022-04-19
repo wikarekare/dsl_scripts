@@ -4,15 +4,15 @@ scripts to update zyxel's iptables, change default passwords and issue random sh
 
 ##zyxel_fix_ip_tables.rb
 
-Zyxel VMG8324-B10A manual shows how to set up multiple routed subnets on the internal network 
+Zyxel VMG8324-B10A manual shows how to set up multiple routed subnets on the internal network
 unfortunately, it then sets up the ip Masquerade rule to only allow the subnet directly on the interface of the Zyxel,
 to connect to the internet.
 
 This is really only needed when the router restarts, but I have no way to know when this happens, short of polling.
 I run this every 3 minutes using cron on a server to update the iptable NAT MASQUERADE rule to work with multiple subnets.
- (this script is imbedded in another script that checks I can ping the zyxel, and the script has locking so only one instance of this code can ever run). 
+ (this script is imbedded in another script that checks I can ping the zyxel, and the script has locking so only one instance of this code can ever run).
 
-An alternate fix would be to double NAT. i.e put a NAT router between the internal subnets and the Zyxel. 
+An alternate fix would be to double NAT. i.e put a NAT router between the internal subnets and the Zyxel.
 
 The Zyxel also has default passwords in the firmware, that are well known, and can't be changed. I use the same script to change these each reboot.
 
@@ -43,4 +43,5 @@ Runs  "iptables -t nat -L POSTROUTING --line-numbers'" on the Zyxel
 
 Runs arbitrary command, taken from the arguments passed to zyxel_ssh.rb
 
-
+## Nb.
+The same code works with the Netcomm NF4V.

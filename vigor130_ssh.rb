@@ -12,24 +12,10 @@ require_relative "#{RLIB}/wikk_conf.rb"
 
 begin
   Net::SSH::Transport::Algorithms::ALGORITHMS[:encryption] = [ '3des-cbc', 'none' ]
+  Net::SSH::Transport::Algorithms::ALGORITHMS[:host_key] = [ 'ssh-dss', 'none' ]
 
   Net::SSH.start(@config.hostname, @config.admin_user, password: @config.admin_key) do |session|
-    t = Net::SSH::Telnet.new('Session' => session, 'Prompt' => /^.*[>#] .*$/, 'Telnetmode' => false)
-
-    # Get a shell
-    t.cmd( 'echo && bash')
-
-    # Check ip tables haven't reverted to dumb state, and fix if necessary
-    @output = ''
-    t.cmd( ARGV.join(' ')) { |o| @output << o } # Found sometimes we get partial lines back.
-    @output.each_line do |l|
-      puts l
-    end
-
-    # Exit sh
-    t.puts 'exit'
-    # Exit CLI
-    t.puts 'exit'
+    t = Net::SSH::Telnet.new('Session' => session, 'Prompt' => /^> .*$/, 'Telnetmode' => false)
   end
 rescue Exception => e
   puts "Error: #{e}"
