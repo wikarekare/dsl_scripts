@@ -25,7 +25,7 @@ puts 'In NFV4 fix iptables'
 def fix_nat_rule(line)
   line = line.strip
   if line =~ /^[0-9]+    MASQUERADE  all  --  #{@nf4v.local_lan}     anywhere/
-    rule_number = line.split(' ')[0]
+    rule_number = line.split(' ')[0] # rubocop:disable Style/RedundantArgument
     return true, rule_number
   else
     return false, 0
@@ -74,10 +74,10 @@ begin
       t.cmd "iptables -I INPUT 1 -p tcp -s #{@nf4v.local_lan} -j ACCEPT"
       t.cmd "iptables -I INPUT 1 -p udp -s #{@nf4v.local_lan} -j ACCEPT"
 
-      @nf4v.admin_lans.each do |l|
+      @nf4v.admin_lans.each do |al|
         # Admin possible from these Net addresses. (Need to change these to service rules)
-        t.cmd "iptables -I INPUT 1 -p tcp -s #{l} -j ACCEPT"
-        t.cmd "iptables -I INPUT 1 -p udp -s #{l} -j ACCEPT"
+        t.cmd "iptables -I INPUT 1 -p tcp -s #{al} -j ACCEPT"
+        t.cmd "iptables -I INPUT 1 -p udp -s #{al} -j ACCEPT"
       end
     end
 
@@ -86,6 +86,6 @@ begin
     # Exit CLI
     t.puts 'exit'
   end
-rescue Exception => e
+rescue StandardError => e
   puts "Error: #{e}"
 end

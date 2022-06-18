@@ -31,6 +31,6 @@ begin
     # Exit CLI
     t.puts 'exit'
   end
-rescue Exception => e
+rescue StandardError => e
   puts "Error: #{e}"
 end

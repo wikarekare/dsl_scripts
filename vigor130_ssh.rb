@@ -15,8 +15,8 @@ begin
   Net::SSH::Transport::Algorithms::ALGORITHMS[:host_key] = [ 'ssh-dss', 'none' ]
 
   Net::SSH.start(@config.hostname, @config.admin_user, password: @config.admin_key) do |session|
-    t = Net::SSH::Telnet.new('Session' => session, 'Prompt' => /^> .*$/, 'Telnetmode' => false)
+    Net::SSH::Telnet.new('Session' => session, 'Prompt' => /^> .*$/, 'Telnetmode' => false)
   end
-rescue Exception => e
+rescue StandardError => e
   puts "Error: #{e}"
 end
