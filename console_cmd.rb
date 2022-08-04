@@ -18,7 +18,7 @@ begin
 
     # Check ip tables haven't reverted to dumb state, and fix if necessary
     @output = ''
-    t.cmd( ARGV.join(' ')) { |o| @output << o } # Found sometimes we get partial lines back.
+    t.cmd( ARGV[1..-1].join(' ')) { |o| @output << o } # Found sometimes we get partial lines back.
     @output.each_line do |l|
       puts l
     end
