@@ -3,12 +3,12 @@ require 'rubygems'
 require 'net/ssh'
 require 'net/ssh/telnet'
 require 'wikk_configuration'
-RLIB = '../../../rlib'
+RLIB = '/wikk/rlib' unless defined? RLIB
 require_relative "#{RLIB}/wikk_conf.rb"
 
 # SSH to the VDSL Modem and run the command specified by the arguments passed.
 
-@config = WIKK::Configuration.new("#{KEYS_DIR}/#{ARGV[0]}")
+@config = WIKK::Configuration.new("#{ARGV[0]}")
 
 begin
   Net::SSH::Transport::Algorithms::ALGORITHMS[:encryption] = [ '3des-cbc', 'none' ]

@@ -4,7 +4,7 @@ require 'net/ssh'
 require 'net/ssh/telnet'
 require 'pp'
 require 'wikk_configuration'
-RLIB = '../../../rlib'
+RLIB = '/wikk/rlib' unless defined? RLIB
 require_relative "#{RLIB}/wikk_conf.rb"
 
 # Zyxel VMG8324-B10A manual shows how to set up multiple routed subnets on the internal network
@@ -19,13 +19,13 @@ require_relative "#{RLIB}/wikk_conf.rb"
 
 puts 'In Zyxel fix iptables'
 
-@zyxel = WIKK::Configuration.new("#{KEYS_DIR}/#{ARGV[0]}")
+@zyxel = WIKK::Configuration.new("#{ARGV[0]}")
 
 # determine if we need to fix the NAT rules (hence also do other changes too)
 def fix_nat_rule(line)
   line = line.strip
   if line =~ /^[0-9]+    MASQUERADE  all  --  #{@zyxel.local_lan}     anywhere/
-    rule_number = line.split(' ')[0]
+    rule_number = line.split[0]
     return true, rule_number
   else
     return false, 0
@@ -49,10 +49,10 @@ end
 def fix_routes(t)
   puts 'Add private address range routes'
   # Add local route, as saving settings is failing
-  t.cmd "route add -net 192.168.0.0 netmask 255.255.0.0 gw #{GATE_DSL=}"
-  t.cmd "route add -net 172.16.0.0 netmask 255.240.0.0 gw #{GATE_DSL=}"
-  t.cmd "route add -net 10.0.0.0 netmask 255.0.0.0 gw #{GATE_DSL=}"
-  t.cmd "route add -net 100.64.0.0 netmask 255.192.0.0 gw #{GATE_DSL=}"
+  t.cmd "route add -net 192.168.0.0 netmask 255.255.0.0 gw #{GATE_DSL}"
+  t.cmd "route add -net 172.16.0.0 netmask 255.240.0.0 gw #{GATE_DSL}"
+  t.cmd "route add -net 10.0.0.0 netmask 255.0.0.0 gw #{GATE_DSL}"
+  t.cmd "route add -net 100.64.0.0 netmask 255.192.0.0 gw #{GATE_DSL}"
   t.cmd 'route -n'
 end
 # Next line limits encryption algorithms so packet size doesn't overflow Zyxel sshd, causing it to disconnect before authentication.
@@ -96,10 +96,10 @@ begin
       t.cmd "iptables -I INPUT 1 -p tcp -s #{@zyxel.local_lan} -j ACCEPT"
       t.cmd "iptables -I INPUT 1 -p udp -s #{@zyxel.local_lan} -j ACCEPT"
 
-      @zyxel.admin_lans.each do |l|
+      @zyxel.admin_lans.each do |al|
         # Admin possible from these Net addresses. (Need to change these to service rules)
-        t.cmd "iptables -I INPUT 1 -p tcp -s #{l} -j ACCEPT"
-        t.cmd "iptables -I INPUT 1 -p udp -s #{l} -j ACCEPT"
+        t.cmd "iptables -I INPUT 1 -p tcp -s #{al} -j ACCEPT"
+        t.cmd "iptables -I INPUT 1 -p udp -s #{al} -j ACCEPT"
       end
 
       # Drop from others inside the network

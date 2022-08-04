@@ -3,12 +3,12 @@ require 'rubygems'
 require 'net/ssh'
 require 'net/ssh/telnet'
 require 'wikk_configuration'
-RLIB = '../../../rlib'
+RLIB = '/wikk/rlib' unless defined? RLIB
 require_relative "#{RLIB}/wikk_conf.rb"
 
-# SSH to the VDSL modem and run the command specified by the arguments passed.
+# Connects to the VDSL modem and dumps the IP tables.
 
-@config = WIKK::Configuration.new("#{KEYS_DIR}/#{ARGV[0]}")
+@config = WIKK::Configuration.new("#{ARGV[0]}")
 
 begin
   Net::SSH::Transport::Algorithms::ALGORITHMS[:encryption] = [ '3des-cbc', 'none' ]
@@ -17,11 +17,11 @@ begin
     t = Net::SSH::Telnet.new('Session' => session, 'Prompt' => /^.*[>#] .*$/, 'Telnetmode' => false)
 
     # Get a shell
-    # t.cmd( 'echo && bash')
+    t.cmd( 'echo && bash')
 
     # Check ip tables haven't reverted to dumb state, and fix if necessary
     @output = ''
-    t.cmd( ARGV.join(' ')) { |o| @output << o } # Found sometimes we get partial lines back.
+    t.cmd( 'iptables -t nat -L POSTROUTING --line-numbers') { |o| @output << o } # Found sometimes we get partial lines back.
     @output.each_line do |l|
       puts l
     end

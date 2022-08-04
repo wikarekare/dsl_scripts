@@ -3,12 +3,12 @@ require 'rubygems'
 require 'net/ssh'
 require 'net/ssh/telnet'
 require 'wikk_configuration'
-RLIB = '../../../rlib'
+RLIB = '/wikk/rlib' unless defined? RLIB
 require_relative "#{RLIB}/wikk_conf.rb"
 
 # SSH to the VDSL Modem and run the command specified by the arguments passed.
 
-@config = WIKK::Configuration.new("#{KEYS_DIR}/#{ARGV[0]}")
+@config = WIKK::Configuration.new("#{ARGV[0]}")
 
 begin
   Net::SSH::Transport::Algorithms::ALGORITHMS[:encryption] = [ '3des-cbc', 'none' ]
@@ -21,7 +21,7 @@ begin
 
     # Check ip tables haven't reverted to dumb state, and fix if necessary
     @output = ''
-    t.cmd( ARGV.join(' ')) { |o| @output << o } # Found sometimes we get partial lines back.
+    t.cmd( ARGV[1..-1].join(' ')) { |o| @output << o } # Found sometimes we get partial lines back.
     @output.each_line do |l|
       puts l
     end

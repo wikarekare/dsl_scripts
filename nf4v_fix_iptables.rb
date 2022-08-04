@@ -4,7 +4,7 @@ require 'net/ssh'
 require 'net/ssh/telnet'
 require 'pp'
 require 'wikk_configuration'
-RLIB = '../../../rlib'
+RLIB = '/wikk/rlib' unless defined? RLIB
 require_relative "#{RLIB}/wikk_conf.rb"
 
 # NFV4 manual shows how to set up multiple routed subnets on the internal network
@@ -19,12 +19,12 @@ require_relative "#{RLIB}/wikk_conf.rb"
 
 puts 'In NFV4 fix iptables'
 
-@nf4v = WIKK::Configuration.new("#{KEYS_DIR}/#{ARGV[0]}")
+@nf4v = WIKK::Configuration.new("#{ARGV[0]}")
 
 # determine if we need to fix the NAT rules (hence also do other changes too)
 def fix_nat_rule(line)
   line = line.strip
-  if line =~ /^[0-9]+    MASQUERADE  all  --  #{@nf4v.local_lan}     anywhere/
+  if line =~ /^[0-9]+ +MASQUERADE +all +-- +#{@nf4v.local_lan} +anywhere/
     rule_number = line.split(' ')[0] # rubocop:disable Style/RedundantArgument
     return true, rule_number
   else
@@ -42,7 +42,7 @@ def fix_passwords(t)
   puts 'changing default passwords'
   t.cmd( "echo -e \"#{@nf4v.support_key}\n#{@nf4v.support_key}\" | (passwd  support )" ) { |l| puts l }
   t.cmd("echo -e \"#{@nf4v.user_key}\n#{@nf4v.user_key}\" | (passwd  user )" ) { |l| puts l }
-  t.cmd("echo -e \"#{@nf4v.nobody_key}\n#{@nf4v.nobody_key}\" | (passwd  nobody )")  { |l| puts l }
+  t.cmd("echo -e \"#{@nf4v.nobody_key}\n#{@nf4v.nobody_key}\" | (passwd  nobody )") { |l| puts l }
 end
 
 # Next line limits encryption algorithms so packet size doesn't overflow NFV4 sshd, causing it to disconnect before authentication.
