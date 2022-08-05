@@ -55,11 +55,12 @@ def fix_routes(t)
   t.cmd "route add -net 100.64.0.0 netmask 255.192.0.0 gw #{GATE_DSL}"
   t.cmd 'route -n'
 end
-# Next line limits encryption algorithms so packet size doesn't overflow Zyxel sshd, causing it to disconnect before authentication.
-Net::SSH::Transport::Algorithms::ALGORITHMS[:encryption] = [ '3des-cbc', 'none' ]
-
 begin
-  Net::SSH.start(@zyxel.hostname, @zyxel.admin_user, password: @zyxel.admin_key) do |session|
+  kex = Net::SSH::Transport::Algorithms::ALGORITHMS[:kex] + [ 'diffie-hellman-group1-sha1' ]
+  # Next line limits encryption algorithms so packet size doesn't overflow NFV4 sshd, causing it to disconnect before authentication.
+  encryption = [ '3des-cbc', 'none' ]
+
+  Net::SSH.start(@zyxel.hostname, @zyxel.admin_user, password: @zyxel.admin_key, encryption: encryption, kex: kex) do |session|
     t = Net::SSH::Telnet.new('Session' => session, 'Prompt' => /^.*[>#] .*$/, 'Telnetmode' => false)
 
     # Get a shell

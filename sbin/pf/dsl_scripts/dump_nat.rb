@@ -11,9 +11,10 @@ require_relative "#{RLIB}/wikk_conf.rb"
 @config = WIKK::Configuration.new("#{ARGV[0]}")
 
 begin
-  Net::SSH::Transport::Algorithms::ALGORITHMS[:encryption] = [ '3des-cbc', 'none' ]
+  kex = Net::SSH::Transport::Algorithms::ALGORITHMS[:kex] + [ 'diffie-hellman-group1-sha1' ]
+  encryption = [ '3des-cbc', 'none' ]
 
-  Net::SSH.start(@config.hostname, @config.admin_user, password: @config.admin_key) do |session|
+  Net::SSH.start(@config.hostname, @config.admin_user, password: @config.admin_key, encryption: encryption, kex: kex) do |session|
     t = Net::SSH::Telnet.new('Session' => session, 'Prompt' => /^.*[>#] .*$/, 'Telnetmode' => false)
 
     # Get a shell

@@ -4,7 +4,7 @@ require 'net/ssh'
 require 'net/ssh/telnet'
 require 'pp'
 require 'wikk_configuration'
-RLIB = '/wikk/rlib' unless defined? RLIB
+RLIB = '../../../rlib'
 require_relative "#{RLIB}/wikk_conf.rb"
 
 # NFV4 manual shows how to set up multiple routed subnets on the internal network
@@ -19,7 +19,7 @@ require_relative "#{RLIB}/wikk_conf.rb"
 
 puts 'In NFV4 fix iptables'
 
-@nf4v = WIKK::Configuration.new("#{ARGV[0]}")
+@nf4v = WIKK::Configuration.new("#{KEYS_DIR}/#{ARGV[0]}")
 
 # determine if we need to fix the NAT rules (hence also do other changes too)
 def fix_nat_rule(line)
@@ -40,20 +40,22 @@ end
 # These need changing each reboot, as they always revert.
 def fix_passwords(t)
   puts 'changing default passwords'
-  t.cmd( "echo -e \"#{@nf4v.support_key}\n#{@nf4v.support_key}\" | (passwd  support )" ) { |l| puts l }
+  t.cmd("echo -e \"#{@nf4v.support_key}\n#{@nf4v.support_key}\" | (passwd  support )" ) { |l| puts l }
+
   t.cmd("echo -e \"#{@nf4v.user_key}\n#{@nf4v.user_key}\" | (passwd  user )" ) { |l| puts l }
   t.cmd("echo -e \"#{@nf4v.nobody_key}\n#{@nf4v.nobody_key}\" | (passwd  nobody )") { |l| puts l }
 end
 
-# Next line limits encryption algorithms so packet size doesn't overflow NFV4 sshd, causing it to disconnect before authentication.
-Net::SSH::Transport::Algorithms::ALGORITHMS[:encryption] = [ '3des-cbc', 'none' ]
-
 begin
-  Net::SSH.start(@nf4v.hostname, @nf4v.admin_user, password: @nf4v.admin_key) do |session|
+  kex = Net::SSH::Transport::Algorithms::ALGORITHMS[:kex] + [ 'diffie-hellman-group1-sha1' ]
+  # Next line limits encryption algorithms so packet size doesn't overflow NFV4 sshd, causing it to disconnect before authentication.
+  encryption = [ '3des-cbc', 'none' ]
+
+  Net::SSH.start(@nf4v.hostname, @nf4v.admin_user, password: @nf4v.admin_key, encryption: encryption, kex: kex) do |session|
     t = Net::SSH::Telnet.new('Session' => session, 'Prompt' => /^.*[>#] .*$/, 'Telnetmode' => false)
 
     # Get a shell
-    t.cmd( 'echo && bash')
+    t.cmd('echo && bash')
 
     # Check ip tables haven't reverted to dumb state, and fix if necessary
     @output = ''
