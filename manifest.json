@@ -1,0 +1,8 @@
+[
+  { "src": "sbin/",
+    "dst": "sbin",
+    "mode": "0755",
+    "user": "root",
+    "group": "root"
+  }
+]
