@@ -3,8 +3,10 @@ require 'rubygems'
 require 'net/ssh'
 require 'net/ssh/telnet'
 require 'wikk_configuration'
-RLIB = '/wikk/rlib' unless defined? RLIB
-require_relative "#{RLIB}/wikk_conf.rb"
+
+unless defined? WIKK_CONF
+  load '/wikk/etc/wikk.conf'
+end
 
 # SSH to the VDSL Modem and run the command specified by the arguments passed.
 

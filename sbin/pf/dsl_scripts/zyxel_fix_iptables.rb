@@ -4,8 +4,10 @@ require 'net/ssh'
 require 'net/ssh/telnet'
 require 'pp'
 require 'wikk_configuration'
-RLIB = '/wikk/rlib' unless defined? RLIB
-require_relative "#{RLIB}/wikk_conf.rb"
+
+unless defined? WIKK_CONF
+  load '/wikk/etc/wikk.conf'
+end
 
 # Zyxel VMG8324-B10A manual shows how to set up multiple routed subnets on the internal network
 # unfortunately, it then sets up the ip Masquerade rule to only allow the subnet on the interface of the Zyxel

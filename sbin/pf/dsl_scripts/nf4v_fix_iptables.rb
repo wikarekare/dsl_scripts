@@ -4,8 +4,9 @@ require 'net/ssh'
 require 'net/ssh/telnet'
 require 'pp'
 require 'wikk_configuration'
-RLIB = '../../../rlib'
-require_relative "#{RLIB}/wikk_conf.rb"
+unless defined? WIKK_CONF
+  load '/wikk/etc/wikk.conf'
+end
 
 # NFV4 manual shows how to set up multiple routed subnets on the internal network
 # unfortunately, it then sets up the ip Masquerade rule to only allow the subnet on the interface of the NFV4
